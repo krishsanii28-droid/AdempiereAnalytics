@@ -374,7 +374,7 @@
   }
 
   // Shared with forecast.js
-  window.InsightAI = { api, el, css, number, filterParams, refreshKpis };
+  window.InsightAI = { api, el, css, number, filterParams, refreshKpis, drawChart, drawTable };
 
   async function start() {
     buildCards();
@@ -414,6 +414,7 @@
       for (const entry of Object.values(cards)) if (entry.data) draw(entry);
     });
     window.InsightAIForecast.init();
+    window.InsightAIAssistant.init();
     refresh();
   }
 

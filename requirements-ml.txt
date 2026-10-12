@@ -1,4 +1,6 @@
-# Forecasting (optional). Without these the service still runs and forecasts fall back to the baseline.
+# Forecasting and question matching (optional). Without these the service still runs: forecasts
+# fall back to the statistical baseline and the assistant falls back to keyword matching.
 -r requirements.txt
 torch>=2.2,<3                 # runs the Chronos models; the Windows wheel on PyPI is CPU-only
 chronos-forecasting>=2.3,<3   # Amazon Chronos pretrained forecasting models (Apache-2.0); brings numpy, pandas, transformers
+sentence-transformers>=5,<7   # runs all-MiniLM-L6-v2 to match a question to an approved intent (Apache-2.0)

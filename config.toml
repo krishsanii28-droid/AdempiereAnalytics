@@ -32,3 +32,10 @@ excess_cover_weeks = 26               # more cover than this is flagged as exces
 [synthetic]
 seed = 20261012                       # same seed gives the same synthetic demand
 weeks = 156                           # length of each synthetic series (3 years, so a seasonal baseline can be tested)
+
+[assistant]
+model = "sentence-transformers/all-MiniLM-L6-v2"   # embedding model used only to match a question to an approved intent
+threshold = 0.55                                   # minimum cosine similarity; see docs/stage5_assistant.md for how it was set
+max_question_chars = 300
+default_top_n = 5
+max_top_n = 50

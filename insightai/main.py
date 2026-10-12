@@ -10,10 +10,13 @@ from pathlib import Path
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
 
 from . import auth, db, queries
 from .auth import Session
 from .config import get_settings
+from .assistant import engine as assistant_engine
+from .assistant import matcher as assistant_matcher
 from .forecast import store as forecast_store
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -25,6 +28,7 @@ STATIC = Path(__file__).resolve().parent / "static"
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     get_settings()  # fail at start-up, not on the first request, if configuration is incomplete
+    assistant_matcher.warm_up()   # load the embedding model in the background
     yield
     db.close_pool()
 
@@ -133,6 +137,20 @@ def chart(name: str, scoped: tuple[queries.Scope, queries.Filters] = Depends(_sc
         raise HTTPException(status_code=404, detail="Unknown chart.")
     scope, filters = scoped
     return queries.chart(name, scope, filters)
+
+
+class Question(BaseModel):
+    question: str = Field(max_length=2000)
+
+
+@app.post("/api/assistant/ask")
+def assistant_ask(body: Question, session: Session = Depends(auth.require_session)) -> dict:
+    return assistant_engine.ask(session, body.question)
+
+
+@app.get("/api/assistant/questions")
+def assistant_questions(_: Session = Depends(auth.require_session)) -> list:
+    return assistant_engine.supported_questions()
 
 
 @app.get("/api/forecast")

@@ -123,6 +123,26 @@ tbody tr:last-child td { border-bottom: 0; }
 
 .footnote { margin-top: 20px; font-size: 12px; color: var(--text-muted); }
 
+/* Assistant panel */
+.assistant { margin-bottom: 16px; }
+.as-form { display: flex; gap: 8px; margin-top: 12px; }
+.as-form input {
+  flex: 1; min-width: 0; font: inherit; color: var(--text); background: var(--page);
+  border: 1px solid var(--axis); border-radius: 6px; padding: 8px 10px;
+}
+button.primary { background: var(--accent); color: #fff; border: 1px solid var(--accent); padding: 8px 18px; font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+button.chip {
+  background: transparent; color: var(--text-secondary); border: 1px solid var(--axis);
+  border-radius: 999px; padding: 3px 12px; font-size: 12px;
+}
+button.chip:hover { background: var(--grid); color: var(--text); }
+.as-answer { transition: opacity .15s; }
+.as-answer:not(:empty) { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--grid); }
+.as-question { margin: 0 0 4px; font-size: 12px; color: var(--text-muted); }
+.as-text { margin: 0 0 8px; font-size: 16px; line-height: 1.4; }
+.as-plot { margin-top: 8px; max-width: 760px; }
+
 /* Forecast panel */
 .forecast { margin-bottom: 16px; }
 .fc-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }

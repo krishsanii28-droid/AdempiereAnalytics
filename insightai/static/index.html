@@ -19,6 +19,23 @@
   </header>
 
   <main>
+    <section class="card assistant" aria-label="Ask InsightAI">
+      <header>
+        <div>
+          <h2>Ask InsightAI</h2>
+          <p class="basis">Answers come from fixed, approved queries over ADempiere data. The filters below do not apply here:
+            name the period in your question.</p>
+        </div>
+      </header>
+      <form id="as-form" class="as-form">
+        <input type="text" id="as-input" maxlength="300" autocomplete="off" aria-label="Your question"
+               placeholder="For example: What were our top five products by sales last month?">
+        <button type="submit" id="as-button" class="primary">Ask</button>
+      </form>
+      <div id="as-examples" class="chips"></div>
+      <div id="as-answer" class="as-answer" aria-live="polite"></div>
+    </section>
+
     <section class="filters" aria-label="Filters">
       <label>Period
         <select id="f-period">
@@ -82,6 +99,7 @@
 
   <script src="/vendor/plotly.min.js"></script>
   <script src="/static/forecast.js"></script>
+  <script src="/static/assistant.js"></script>
   <script src="/static/app.js"></script>
 </body>
 </html>

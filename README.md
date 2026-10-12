@@ -10,7 +10,7 @@ Analytics and decision-support module for a local ADempiere 3.9.3 installation (
 | 2. Data discovery, `insightai` schema, read-only role, KPI definitions | Done: `docs/stage2_data_discovery.md`, `docs/kpi_definitions.md` |
 | 3. FastAPI service and dashboard | Done: KPI cards, sales, purchase, inventory and receivables views, filters |
 | 4. Forecasting | Done: `docs/stage4_forecasting.md`. Chronos forecast, baseline comparison, stockout risk, synthetic demo mode |
-| 5. Assistant | Not started |
+| 5. Assistant | Done: `docs/stage5_assistant.md`. 16 approved question types, MiniLM matching with keyword fallback |
 | 6. ADempiere menu integration | Not started |
 | 7. Testing and documentation | Not started |
 
@@ -68,6 +68,12 @@ powershell -ExecutionPolicy Bypass -File scripts\setup_service.ps1 -ML
 The first command adds PyTorch (CPU) and `chronos-forecasting`, about 1 GB. The second downloads the model to `models/` on first use (183 MB), then writes the real and synthetic result files to `data/`. Both folders are ignored by git. The dashboard's **Run forecast** button does the same.
 
 GardenWorld's real shipment history is too thin to forecast, so the real view shows why each product is not forecast and claims no accuracy. The **Synthetic demo data** view is generated demand, labelled as such everywhere it appears. Without the forecasting packages or the model, a statistical baseline is used and the page says so.
+
+### Assistant
+
+The **Ask InsightAI** box answers a fixed set of business questions in plain English. A local embedding model (`all-MiniLM-L6-v2`, installed by `setup_service.ps1 -ML`) picks which approved query fits the question; no SQL is generated and nothing is sent to an outside service. Questions it cannot place are declined with a list of what it can answer.
+
+To see how the matcher performs: `.venv\Scripts\python.exe scripts\calibrate_assistant.py --test`
 
 ### Tests
 

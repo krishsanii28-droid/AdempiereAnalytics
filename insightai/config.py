@@ -39,6 +39,11 @@ class Settings:
     excess_cover_weeks: int
     synthetic_seed: int
     synthetic_weeks: int
+    assistant_model: str
+    assistant_threshold: float
+    assistant_max_chars: int
+    assistant_default_top_n: int
+    assistant_max_top_n: int
 
 
 def _read_env_file(path: Path) -> dict[str, str]:
@@ -68,7 +73,7 @@ def get_settings() -> Settings:
         )
 
     server, database, dashboard = cfg["server"], cfg["database"], cfg["dashboard"]
-    forecast, synthetic = cfg["forecast"], cfg["synthetic"]
+    forecast, synthetic, assistant = cfg["forecast"], cfg["synthetic"], cfg["assistant"]
     quantiles = tuple(sorted(float(q) for q in forecast["quantiles"]))
     if 0.5 not in quantiles or len(quantiles) < 3:
         raise RuntimeError("config.toml [forecast] quantiles must include 0.5 and at least one value either side.")
@@ -100,4 +105,9 @@ def get_settings() -> Settings:
         excess_cover_weeks=int(forecast["excess_cover_weeks"]),
         synthetic_seed=int(synthetic["seed"]),
         synthetic_weeks=int(synthetic["weeks"]),
+        assistant_model=assistant["model"],
+        assistant_threshold=float(assistant["threshold"]),
+        assistant_max_chars=int(assistant["max_question_chars"]),
+        assistant_default_top_n=int(assistant["default_top_n"]),
+        assistant_max_top_n=int(assistant["max_top_n"]),
     )
