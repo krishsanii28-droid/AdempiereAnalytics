@@ -1,0 +1,19 @@
+# secrets and local config
+.env
+*.local.*
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# model cache, generated data, logs
+models/
+data/
+logs/
+*.log
+
+# build output
+build/
+dist/
+*.class
