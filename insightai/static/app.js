@@ -377,6 +377,8 @@
   window.InsightAI = { api, el, css, number, filterParams, refreshKpis, drawChart, drawTable };
 
   async function start() {
+    // Shown inside an ADempiere window: signing out there is done by closing the window
+    if (new URLSearchParams(location.search).get('embedded') === '1') document.body.classList.add('embedded');
     buildCards();
     try {
       state.me = await api('/api/me');

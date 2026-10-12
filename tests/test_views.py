@@ -10,7 +10,7 @@ from insightai import db
 
 FACT_VIEWS = ["v_order_line", "v_invoice", "v_invoice_line", "v_inout_line", "v_demand_daily",
               "v_open_item", "v_stock", "v_stock_movement"]
-ALL_VIEWS = FACT_VIEWS + ["v_user_role_org", "v_user_role", "v_role_process", "v_org", "v_warehouse",
+ALL_VIEWS = FACT_VIEWS + ["v_user_role_org", "v_user_role", "v_role_process", "v_role_form", "v_org", "v_warehouse",
                           "v_product_category", "v_product", "v_bpartner", "v_product_cost"]
 
 

@@ -69,8 +69,9 @@ def test_restricted_role_session_is_limited_to_its_organisations(key):
 
 def test_role_without_the_menu_entry_is_refused(key):
     user_id, role_id = _ids("GardenUser", "GardenWorld User")
-    if db.query_one("SELECT 1 AS ok FROM v_role_process WHERE ad_role_id = %(r)s AND process_value = %(p)s",
-                    {"r": role_id, "p": launch.PROCESS_VALUE}):
+    if db.query_one("SELECT 1 AS ok FROM v_role_process WHERE ad_role_id = %(r)s AND process_value = %(p)s "
+                    "UNION ALL SELECT 1 FROM v_role_form WHERE ad_role_id = %(r)s AND form_classname = %(f)s",
+                    {"r": role_id, "p": launch.PROCESS_VALUE, "f": launch.FORM_CLASSNAME}):
         pytest.skip("GardenWorld User has been granted InsightAI in this database")
     response = TestClient(app).post("/auth/launch-token", json=_request(key, user_id, role_id))
     assert response.status_code == 403 and "not been granted access" in response.json()["detail"]
@@ -96,6 +97,15 @@ def test_wrong_key_stale_and_replayed_requests_are_refused(key):
     once = _request(key, user_id, role_id)
     assert client.post("/auth/launch-token", json=once).status_code == 200
     assert client.post("/auth/launch-token", json=once).status_code == 401       # same nonce again
+
+
+def test_embedded_launch_lands_on_the_embedded_page(key):
+    user_id, role_id = _ids("GardenAdmin", "GardenWorld Admin")
+    client = TestClient(app, follow_redirects=False)
+    url = client.post("/auth/launch-token", json=_request(key, user_id, role_id)).json()["url"]
+    response = client.get(url[len(get_settings().public_url):] + "&embedded=1")
+    assert response.status_code == 303 and response.headers["location"] == "/?embedded=1"
+    assert client.get("/api/me").status_code == 200
 
 
 def test_unknown_or_missing_code_does_not_open_a_session():

@@ -220,14 +220,15 @@ def launch_token(body: LaunchRequest) -> JSONResponse:
 
 
 @app.get("/launch", include_in_schema=False)
-def launch_page(code: str = ""):
+def launch_page(code: str = "", embedded: int = 0):
     ids = launch.redeem_code(code)
     if ids is None:
         return HTMLResponse("<!doctype html><meta charset='utf-8'><title>InsightAI</title>"
                             "<link rel='stylesheet' href='/static/styles.css'><main class='dev-login'>"
                             "<h1>This link has expired</h1><p>InsightAI links from ADempiere work once and for one minute. "
                             "Open InsightAI again from the ADempiere menu.</p></main>", status_code=401)
-    response = RedirectResponse("/", status_code=303)
+    # embedded=1 comes from the ADempiere form window; the page hides what makes no sense there
+    response = RedirectResponse("/?embedded=1" if embedded else "/", status_code=303)
     _set_session_cookie(response, *ids)
     return response
 

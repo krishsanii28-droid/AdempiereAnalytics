@@ -60,6 +60,7 @@ main { max-width: 1440px; margin: 0 auto; padding: 16px 20px 40px; }
 .brand span, .who { color: var(--text-secondary); }
 .brand span { margin-left: 10px; }
 .who a { margin-left: 12px; }
+body.embedded .who a { display: none; }
 
 /* Filters: one row above everything they scope */
 .filters {

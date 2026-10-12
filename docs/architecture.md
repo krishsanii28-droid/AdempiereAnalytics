@@ -6,9 +6,12 @@
  ADempiere desktop client (Swing, Java 8)             Browser
  ┌───────────────────────────────────┐               ┌─────────────────────────┐
  │ Menu: Performance Analysis        │               │ Dashboard page          │
- │   └─ InsightAI                    │  opens link   │  Ask InsightAI          │
- │        └─ InsightAILauncher ──────┼──────────────▶│  KPI cards and charts   │
- │           (insightai.jar)         │               │  Forecast panel         │
+ │   ├─ InsightAI                    │  shows page   │  Ask InsightAI          │
+ │   │    └─ InsightAIForm: window ──┼──────────────▶│  KPI cards and charts   │
+ │   │       with embedded web view  │               │  Forecast panel         │
+ │   └─ InsightAI (browser)          │  opens link   │                         │
+ │        └─ InsightAILauncher ──────┼──────────────▶│ (same page, in the      │
+ │           (both in insightai.jar) │               │  default browser)       │
  └───────────────┬───────────────────┘               └───────────┬─────────────┘
                  │ signed request for a one-time link            │ session cookie
                  ▼                                               ▼
@@ -22,7 +25,7 @@
                  ▼                                              ▼
  ┌───────────────────────────────────────────────┐   ┌─────────────────────────┐
  │ PostgreSQL database EV                        │   │ models/  Chronos, MiniLM│
- │   schema insightai   17 views, 3 functions    │   │ data/    forecast JSON, │
+ │   schema insightai   18 views, 3 functions    │   │ data/    forecast JSON, │
  │        │ owned by insightai_owner             │   │          synthetic CSV  │
  │        ▼ reads a fixed list of tables         │   └─────────────────────────┘
  │   schema adempiere   ADempiere's own tables   │
@@ -49,7 +52,7 @@
 
 | Decision | Reason |
 |---|---|
-| A separate service and web page, opened from the ADempiere menu | Swing cannot render this kind of dashboard, and model inference must not run in the ADempiere client or server |
+| A separate service and web page, shown in an ADempiere window through an embedded web view | Swing cannot draw this kind of dashboard natively, and model inference must not run in the ADempiere client or server. The window only displays the page |
 | Views in a separate schema, read through a role that sees nothing else | The service cannot read passwords, API keys or any table not listed, whatever bug it has |
 | Organisation rules in a view, not in Python | One definition, checkable against ADempiere, and used identically by every query |
 | Separate jar on the launcher classpath | No `RUN_setup`, no change to `Adempiere.jar` or `customization.jar`, removable by deleting one file |

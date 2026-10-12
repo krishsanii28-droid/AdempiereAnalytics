@@ -8,6 +8,7 @@ Runs every InsightAI check and prints one summary.
   2. Read-only role smoke test (db\verify_ro.sql)
   3. Cross-check of the views against ADempiere's own figures (db\crosscheck.sql)
   4. ADempiere launcher, end to end, without the GUI (needs the service running)
+  5. The embedded InsightAI window, opened through ADempiere's own form frame off-screen
 
 Nothing here changes ADempiere business data. Step 4 adds process-instance rows, as running any process does.
 #>
@@ -37,6 +38,10 @@ if (-not $SkipLauncher) {
     Write-Host "`n===== 4. ADempiere launcher ====="
     powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'scripts\test_launcher.ps1') 2>&1 | ForEach-Object { "$_" } | Where-Object { $_ -match '^==|^\s+(ok|FAIL)|passed|FAILED' }
     $results['ADempiere launcher'] = $LASTEXITCODE
+
+    Write-Host "`n===== 5. Embedded window ====="
+    powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'scripts\test_form.ps1') 2>&1 | ForEach-Object { "$_" } | Where-Object { $_ -match '^==|^\s+(ok|FAIL|signed|organisations)|passed|FAILED' }
+    $results['Embedded window'] = $LASTEXITCODE
 }
 
 Write-Host "`n===== Summary ====="

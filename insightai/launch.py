@@ -16,7 +16,8 @@ import time
 from . import auth, db
 from .config import get_settings
 
-PROCESS_VALUE = "InsightAI_Launch"     # AD_Process.Value of the menu entry's process
+PROCESS_VALUE = "InsightAI_Launch"     # AD_Process.Value of the "open in browser" menu entry
+FORM_CLASSNAME = "org.insightai.adempiere.InsightAIForm"   # AD_Form.Classname of the embedded window
 MAX_SKEW_SECONDS = 60
 CODE_TTL_SECONDS = 60
 
@@ -60,8 +61,11 @@ def issue_code(user_id: int, role_id: int, timestamp: int, nonce: str, signature
 
     if auth.load_session(user_id, role_id) is None:
         raise LaunchRefused(403, "That user does not hold that role in ADempiere.")
-    allowed = db.query_one("SELECT 1 AS ok FROM v_role_process WHERE ad_role_id = %(r)s AND process_value = %(p)s",
-                           {"r": role_id, "p": PROCESS_VALUE})
+    # Either menu entry counts: the embedded window (a form) or the browser launcher (a process)
+    allowed = db.query_one(
+        "SELECT 1 AS ok FROM v_role_form WHERE ad_role_id = %(r)s AND form_classname = %(f)s "
+        "UNION ALL SELECT 1 FROM v_role_process WHERE ad_role_id = %(r)s AND process_value = %(p)s LIMIT 1",
+        {"r": role_id, "p": PROCESS_VALUE, "f": FORM_CLASSNAME})
     if not allowed:
         raise LaunchRefused(403, "This role has not been granted access to InsightAI in ADempiere.")
 

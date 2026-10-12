@@ -48,13 +48,7 @@ public class InsightAILauncher extends SvrProcess {
 
 	@Override
 	protected String doIt() throws Exception {
-		Properties config = loadConfig();
-		String serviceUrl = config.getProperty("url", "").trim();
-		String key = config.getProperty("key", "").trim();
-		if (serviceUrl.isEmpty() || key.isEmpty())
-			throw new AdempiereUserError("InsightAI is not set up: " + CONFIG_FILE + " needs both url and key.");
-
-		String launchUrl = requestLaunchUrl(serviceUrl, key, getAD_User_ID(), Env.getAD_Role_ID(getCtx()));
+		String launchUrl = requestLaunchUrl(getAD_User_ID(), Env.getAD_Role_ID(getCtx()), false);
 
 		boolean openBrowser = Ini.isClient() && !Boolean.getBoolean("insightai.nobrowser")
 				&& Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
@@ -64,6 +58,20 @@ public class InsightAILauncher extends SvrProcess {
 		}
 		// Web client or no desktop: the link is valid once, for one minute
 		return "Open this link within one minute: " + launchUrl;
+	}
+
+	/**
+	 * One-time launch URL for this user and role, using the address and key in ADEMPIERE_HOME.
+	 * With embedded = true the page is told it is shown inside an ADempiere window.
+	 */
+	public static String requestLaunchUrl(int userId, int roleId, boolean embedded) throws Exception {
+		Properties config = loadConfig();
+		String serviceUrl = config.getProperty("url", "").trim();
+		String key = config.getProperty("key", "").trim();
+		if (serviceUrl.isEmpty() || key.isEmpty())
+			throw new AdempiereUserError("InsightAI is not set up: " + CONFIG_FILE + " needs both url and key.");
+		String url = requestLaunchUrl(serviceUrl, key, userId, roleId);
+		return embedded ? url + "&embedded=1" : url;
 	}
 
 	private static Properties loadConfig() throws AdempiereUserError {
@@ -77,7 +85,7 @@ public class InsightAILauncher extends SvrProcess {
 		return config;
 	}
 
-	/** Asks the service for a one-time launch URL for this user and role. */
+	/** Asks the service at serviceUrl for a one-time launch URL for this user and role. */
 	public static String requestLaunchUrl(String serviceUrl, String key, int userId, int roleId) throws Exception {
 		long timestamp = System.currentTimeMillis() / 1000L;
 		String nonce = UUID.randomUUID().toString().replace("-", "");

@@ -44,7 +44,7 @@ BEGIN
     'ad_client','ad_clientinfo','ad_org','ad_role','ad_user_roles','ad_role_orgaccess','ad_user_orgaccess',
     'ad_tree','ad_treenode',
     -- which roles may open InsightAI from the ADempiere menu
-    'ad_process','ad_process_access',
+    'ad_process','ad_process_access','ad_form','ad_form_access',
     -- currency
     'c_acctschema','c_currency','c_conversion_rate','c_conversiontype','c_conversiontype_default',
     -- documents
@@ -193,6 +193,13 @@ SELECT pa.ad_role_id, p.value AS process_value
 FROM adempiere.ad_process_access pa
 JOIN adempiere.ad_process p ON p.ad_process_id = pa.ad_process_id AND p.isactive = 'Y'
 WHERE pa.isactive = 'Y';
+
+-- Which forms a role may open (AD_Form_Access), by the form's class name.
+CREATE OR REPLACE VIEW insightai.v_role_form AS
+SELECT fa.ad_role_id, f.classname AS form_classname
+FROM adempiere.ad_form_access fa
+JOIN adempiere.ad_form f ON f.ad_form_id = fa.ad_form_id AND f.isactive = 'Y'
+WHERE fa.isactive = 'Y';
 
 -- ---------------------------------------------------------------------------------------
 -- Dimensions (for filters and labels)
