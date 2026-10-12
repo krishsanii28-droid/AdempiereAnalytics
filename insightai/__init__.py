@@ -1,0 +1,1 @@
+"""ADempiere InsightAI analytics service."""

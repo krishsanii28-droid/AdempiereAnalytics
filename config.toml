@@ -1,0 +1,19 @@
+# ADempiere InsightAI service settings. Secrets (database password, signing key) live in .env.
+
+[server]
+host = "127.0.0.1"      # keep on loopback: the service is meant for the machine ADempiere runs on
+port = 8765
+session_hours = 8
+# Lets you pick a user and role at /dev/login without going through ADempiere.
+# For development only. Set to false once the ADempiere menu entry (Stage 6) is in place.
+dev_login = true
+
+[database]
+statement_timeout_ms = 15000
+pool_max = 4
+
+[dashboard]
+default_months = 12      # date range shown when the page opens
+top_n = 10               # rows in "top products / customers" rankings
+slow_moving_days = 90    # stock with no outbound movement for this long is listed as slow-moving
+max_rows = 200           # hard cap on rows returned by any list

@@ -1,0 +1,5 @@
+# Analytics service (Python 3.12)
+fastapi>=0.115,<1.0          # HTTP API
+uvicorn>=0.30,<1.0           # ASGI server that runs it
+psycopg[binary,pool]>=3.2,<4 # PostgreSQL driver and connection pool
+plotly>=6.0,<7               # used only for the plotly.min.js it bundles, so charts work offline

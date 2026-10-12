@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>InsightAI</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <strong>InsightAI</strong>
+      <span id="client-name"></span>
+    </div>
+    <div class="who">
+      <span id="who"></span>
+      <a href="/logout">Sign out</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="filters" aria-label="Filters">
+      <label>Period
+        <select id="f-period">
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
+          <option value="default" selected>Last 12 months</option>
+          <option value="year">This year</option>
+          <option value="all">All time</option>
+          <option value="custom">Custom</option>
+        </select>
+      </label>
+      <label>From <input type="date" id="f-from"></label>
+      <label>To <input type="date" id="f-to"></label>
+      <label>Organisation <select id="f-org"></select></label>
+      <label>Warehouse <select id="f-warehouse"></select></label>
+      <label>Product category <select id="f-category"></select></label>
+      <label>Business partner <select id="f-bpartner"></select></label>
+      <button type="button" id="f-reset" class="ghost">Reset</button>
+    </section>
+
+    <div id="page-message" class="page-message" hidden></div>
+
+    <section id="kpis" class="kpis" aria-label="Key figures"></section>
+    <section id="charts" class="charts" aria-label="Charts"></section>
+
+    <footer class="footnote">
+      Figures come from completed and closed ADempiere documents only, limited to the organisations your role can access.
+      Amounts are in <span id="currency-name">the accounting currency</span>.
+    </footer>
+  </main>
+
+  <script src="/vendor/plotly.min.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
