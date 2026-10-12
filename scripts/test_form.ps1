@@ -36,19 +36,19 @@ foreach ($case in $cases) {
     $ErrorActionPreference = 'Stop'
     if ($text -notmatch '(FORM opened=[^\r\n]*)') { Write-Host '   FAIL: no result'; ($text -split "`n") | Select-Object -Last 8 | ForEach-Object { "   $_" }; $failed++; continue }
     $line = $Matches[1]
-    $inMenu = if ($text -match 'MENU embedded=(\w+) browser=(\w+)') { "$($Matches[1]),$($Matches[2])" } else { 'unknown' }
+    $access = if ($text -match 'ACCESS form=(\w+)') { $Matches[1] } else { 'unknown' }
     if ($case.Expect -eq 'refused') {
-        # Two separate protections. ADempiere leaves the entries out of this role's menu. And if the
-        # window is opened anyway, as this test does, the service refuses to sign the role in.
-        if ($inMenu -eq 'false,false') { Write-Host "   ok: neither InsightAI entry is in this role's menu" }
-        else { Write-Host "   FAIL: menu entries shown (embedded,browser) = $inMenu"; $failed++ }
+        # Two separate protections. The role has no access to the form, so the Performance tab does not
+        # offer InsightAI. And if the window is opened anyway, as this test does, the service refuses to sign the role in.
+        if ($access -eq 'false') { Write-Host "   ok: ADempiere reports no access to the InsightAI form for this role" }
+        else { Write-Host "   FAIL: form access = $access"; $failed++ }
         $status = if ($text -match 'STATUS ([^\r\n]*)') { $Matches[1] } else { '' }
         if ($line -match 'loaded=false' -and $status -match 'not been granted access') { Write-Host "   ok: forced open, the window shows no data and says: $status" }
         else { Write-Host "   FAIL: $line $status"; $failed++ }
         continue
     }
-    if ($inMenu -eq 'true,true') { Write-Host "   ok: both InsightAI entries are in this role's menu" }
-    else { Write-Host "   FAIL: menu entries shown (embedded,browser) = $inMenu"; $failed++; continue }
+    if ($access -eq 'true') { Write-Host "   ok: ADempiere reports access to the InsightAI form for this role" }
+    else { Write-Host "   FAIL: form access = $access"; $failed++; continue }
     if ($line -notmatch 'opened=true loaded=true seen=(\{.*\})') { Write-Host "   FAIL: $line"; $failed++; continue }
     $seen = $Matches[1] | ConvertFrom-Json
     $orgs = @($seen.organisations | Select-Object -Skip 1)     # the first option is "All my organisations" / "My organisation"

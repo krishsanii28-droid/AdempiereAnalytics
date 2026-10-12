@@ -26,7 +26,7 @@ Run these in order. Each is safe to run again.
 | 1 | `powershell -ExecutionPolicy Bypass -File scripts\db_install.ps1` | Creates the `insightai` schema, views and the two database roles; writes the service's database login to `.env` |
 | 2 | `powershell -ExecutionPolicy Bypass -File scripts\setup_service.ps1 -ML` | Creates `.venv`, installs the packages including PyTorch, Chronos and sentence-transformers; adds the session signing key to `.env` |
 | 3 | `.venv\Scripts\python.exe -m insightai.forecast` | Downloads the forecasting model on first use and builds the forecast files |
-| 4 | `powershell -ExecutionPolicy Bypass -File scripts\adempiere_install.ps1` | Compiles the launcher and the embedded window, adds three files to the ADempiere folder, adds the **InsightAI** and **InsightAI (browser)** menu entries and grants them to the roles in `-Roles` |
+| 4 | `powershell -ExecutionPolicy Bypass -File scripts\adempiere_install.ps1` | Compiles the InsightAI classes, adds three files to the ADempiere folder, adds the InsightAI form and launcher records and grants them to the roles in `-Roles`. It adds no menu entry |
 | 5 | `powershell -ExecutionPolicy Bypass -File scripts\run_service.ps1` | Starts the service. Leave this window open |
 | 6 | Start ADempiere with `C:\Adempiere\RUN_Adempiere_InsightAI.bat` | The desktop client with the launcher on its classpath |
 
@@ -44,7 +44,7 @@ The list is complete: a role you leave out loses access.
 
 1. Start the service: `scripts\run_service.ps1`. The first question to the assistant is fast only after the model has loaded, a few seconds after start-up.
 2. Start ADempiere with `RUN_Adempiere_InsightAI.bat` and log in.
-3. Click **InsightAI** in the main menu. It sits at the top level, directly below the Performance Analysis folder, so it is visible without opening any folder. The dashboard opens in an ADempiere window, signed in as your ADempiere user and role. **InsightAI (browser)**, the last item inside the Performance Analysis folder, opens the same dashboard in your web browser instead.
+3. When ADempiere opens, the **Performance** tab is showing, with an **Open InsightAI dashboard** button at the top. Press it: the dashboard opens in an ADempiere window, signed in as your ADempiere user and role. The window has an **Open in browser** button if you prefer your web browser.
 4. Use **Run forecast** on the page, or step 3 above, after stock or shipments change. The forecast is a snapshot of the moment it was run.
 
 Settings are in `config.toml`: port, default period, forecast horizon and thresholds, model names, assistant threshold. Restart the service after changing it.
@@ -57,21 +57,21 @@ Settings are in `config.toml`: port, default period, forecast horizon and thresh
 powershell -ExecutionPolicy Bypass -File scripts\run_tests.ps1
 ```
 
-This runs the Python tests, the read-only role check, the comparison with ADempiere's own figures, the launcher hand-off for four logins, and the embedded window for three (it opens ADempiere windows off-screen for a few seconds each). It needs the service running for the last part (`-SkipLauncher` leaves that part out). Every line of the summary should say PASS.
+This runs the Python tests, the read-only role check, the comparison with ADempiere's own figures, the launcher hand-off for four logins, the embedded window for three (opened off-screen), and the real desktop client: it starts ADempiere, logs in with the saved login, presses the button on the Performance tab and closes again after about half a minute. It needs the service running for the last part (`-SkipLauncher` leaves that part out). Every line of the summary should say PASS.
 
 ## Troubleshooting
 
 | What you see | Cause | What to do |
 |---|---|---|
 | ADempiere: "The InsightAI service is not running at http://127.0.0.1:8765" | The service is not started, or is on another port | Run `scripts\run_service.ps1`. If you changed the port in `config.toml`, run `scripts\adempiere_install.ps1` again so the launcher gets the new address |
-| ADempiere: the **InsightAI** entry is missing from the menu | The role has not been granted the process, or the client was open during install | Run `adempiere_install.ps1 -Roles ...` with that role, then log out of ADempiere and back in |
-| ADempiere: an error naming the class `org.insightai.adempiere.InsightAILauncher` | The client was not started with `RUN_Adempiere_InsightAI.bat`, so the jar is not loaded | Close ADempiere and start it with that file |
+| There is no **Open InsightAI dashboard** button on the Performance tab | ADempiere was not started with `RUN_Adempiere_InsightAI.bat`, or the role has not been granted InsightAI, or the client was open during install | Close ADempiere and start it with that file. If the button is still missing, run `adempiere_install.ps1 -Roles ...` with that role and log in again |
+| The stock start script still shows ADempiere without any InsightAI button | Expected: only `RUN_Adempiere_InsightAI.bat` adds it | Use that file to start ADempiere |
 | The InsightAI window says "This Java runtime has no JavaFX web view" | ADempiere is running on a Java without JavaFX (most OpenJDK 8 builds) | Use **Open in browser** in that window or the **InsightAI (browser)** menu entry, or run ADempiere on Oracle JDK 8 |
 | The InsightAI window stays on "Opening InsightAI..." or shows a service message | The service is not running or was restarted | Start the service, then press **Reload** in the window |
 | Date boxes in the InsightAI window have no calendar | The embedded web view shows date fields as text | Type dates as `2026-01-31`, or use the Period list |
 | ADempiere: "InsightAI is not set up: ...insightai-launcher.properties was not found" | Step 4 was not run, or ADempiere was moved | Run `scripts\adempiere_install.ps1` |
 | ADempiere: "The launch request was not signed with this installation's key" | The key in the ADempiere folder and the one in `.env` differ, or the service was not restarted after install | Run `adempiere_install.ps1`, then restart the service |
-| ADempiere: "This role has not been granted access to InsightAI" | The role can see the menu entry in a cached menu but access was removed | Log out of ADempiere and back in; grant the role if it should have access |
+| The InsightAI window says "This role has not been granted access to InsightAI" | Access was removed from the role while ADempiere was open | Log out of ADempiere and back in; grant the role with `adempiere_install.ps1 -Roles ...` if it should have access |
 | ADempiere: "The launch request has expired" | The clocks of the two programs differ by more than a minute | Only possible if the service runs on another machine; synchronise the clocks |
 | Browser: "This link has expired" | The link was opened twice, or more than a minute after it was made | Click **InsightAI** in ADempiere again |
 | Browser: "Not signed in" or the page asks you to open InsightAI from ADempiere | The session ended (8 hours) or the service was reinstalled | Click **InsightAI** in ADempiere again |
@@ -98,7 +98,7 @@ Do these in order.
 | Step | Command | What it removes |
 |---|---|---|
 | 1 | Close the ADempiere client and stop the service (Ctrl+C in its window) | |
-| 2 | `powershell -ExecutionPolicy Bypass -File scripts\adempiere_install.ps1 -Uninstall` | The menu entry, process, entity type, role access and run history for the process; the three files in the ADempiere folder |
+| 2 | `powershell -ExecutionPolicy Bypass -File scripts\adempiere_install.ps1 -Uninstall` | The form, process, entity type, role access and run history for the process; the three files in the ADempiere folder |
 | 3 | `powershell -ExecutionPolicy Bypass -File scripts\db_install.ps1 -Uninstall` | The `insightai` schema, both database roles and their grants; restores the two PostgreSQL defaults that install tightened |
 | 4 | Delete the project folder | The service, `.venv`, models, forecast files, `.env` |
 

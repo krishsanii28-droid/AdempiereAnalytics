@@ -39,14 +39,8 @@ public class FormHarness {
 
 		final int formId = DB.getSQLValue(null, "SELECT AD_Form_ID FROM AD_Form WHERE Classname='org.insightai.adempiere.InsightAIForm'");
 
-		// The menu tree as the desktop client builds it for this role: entries the role may not open are left out
-		int treeId = DB.getSQLValue(null, "SELECT AD_Tree_ID FROM AD_Tree WHERE TreeType='MM' AND IsActive='Y' ORDER BY AD_Tree_ID");
-		org.compiere.model.MTree menu = new org.compiere.model.MTree(ctx, treeId, false, true, null);
-		int embeddedMenu = DB.getSQLValue(null, "SELECT AD_Menu_ID FROM AD_Menu WHERE AD_Form_ID=?", formId);
-		int browserMenu = DB.getSQLValue(null,
-				"SELECT m.AD_Menu_ID FROM AD_Menu m JOIN AD_Process p ON p.AD_Process_ID=m.AD_Process_ID WHERE p.Value='InsightAI_Launch'");
-		System.out.println("MENU embedded=" + (menu.getRoot().findNode(embeddedMenu) != null)
-				+ " browser=" + (menu.getRoot().findNode(browserMenu) != null));
+		// What ADempiere's role object says, which is what decides whether the Performance tab shows the option
+		System.out.println("ACCESS form=" + (MRole.getDefault(ctx, false).getFormAccess(formId) != null));
 
 		final FormFrame[] frame = new FormFrame[1];
 		final boolean[] opened = new boolean[1];

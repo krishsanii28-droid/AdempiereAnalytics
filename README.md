@@ -11,7 +11,7 @@ The original brief is in `ADempiere_InsightAI_prompt_v2.md`.
 - **Dashboard.** Sales, purchases, receivables, inventory value and turnover, supplier delivery performance; monthly trends, rankings by product, category and customer, receivables aging, slow-moving stock. Filters for period, organisation, warehouse, category and business partner.
 - **Demand forecast and stockout risk.** Weekly demand per product and warehouse forecast with Amazon Chronos-Bolt, compared with actual stock and open purchase orders. Evaluated against simple baselines. A clearly labelled synthetic demo mode exists because GardenWorld's real history is too thin to forecast.
 - **Ask InsightAI.** 16 kinds of business question matched with a local embedding model to fixed, approved queries. No SQL is generated and nothing is sent to an outside service.
-- **Inside ADempiere.** The dashboard opens as an ADempiere window, signed in automatically.
+- **Inside ADempiere.** A button on the Performance tab of ADempiere's main window opens the dashboard as an ADempiere window, signed in automatically.
 - **Access.** The session comes from the ADempiere login. Client and organisations are taken from ADempiere's own role tables on every request. The service reads through a database role that can see only InsightAI's views.
 
 ## Getting started
@@ -26,7 +26,7 @@ powershell -ExecutionPolicy Bypass -File scripts\adempiere_install.ps1
 powershell -ExecutionPolicy Bypass -File scripts\run_service.ps1
 ```
 
-Then start ADempiere with `RUN_Adempiere_InsightAI.bat` and click **InsightAI** in the main menu, directly below Performance Analysis. The dashboard opens in an ADempiere window; **InsightAI (browser)**, inside the Performance Analysis folder, opens it in your web browser instead.
+Then start ADempiere with `RUN_Adempiere_InsightAI.bat`. When it opens, the **Performance** tab is showing, with an **Open InsightAI dashboard** button at the top. Press it: the dashboard opens in an ADempiere window, signed in as your ADempiere user and role.
 
 To check an installation: `powershell -ExecutionPolicy Bypass -File scripts\run_tests.ps1`
 
@@ -43,12 +43,12 @@ To check an installation: `powershell -ExecutionPolicy Bypass -File scripts\run_
 | [docs/stage4_forecasting.md](docs/stage4_forecasting.md) | Model comparison, evaluation, synthetic mode, limits |
 | [docs/stage5_assistant.md](docs/stage5_assistant.md) | Supported questions, matching accuracy, limits |
 | [docs/stage6_integration.md](docs/stage6_integration.md) | Menu entry, launcher, sign-in hand-off, 2Pack |
-| [docs/embedded_window.md](docs/embedded_window.md) | The dashboard inside an ADempiere window: how it works, tests, limits |
+| [docs/embedded_window.md](docs/embedded_window.md) | The button on the Performance tab and the dashboard window: how it works, tests, limits |
 
 ## Status
 
 All seven stages of the brief are built. Three things to know before relying on it:
 
-1. **Nobody has yet clicked the entry in the real ADempiere client.** An automated test opens the embedded window through ADempiere's own window code and checks what it shows for three roles, but it does not click or type inside the page.
+1. **No person has used it in the ADempiere client yet.** An automated test starts the real client, presses the button on the Performance tab and reads the dashboard that opens, but nobody has worked in it by hand.
 2. **Forecast accuracy is measured on synthetic demand only.** GardenWorld has shipments for 6 stocked products on 7 days in total, so nothing real can be forecast or evaluated yet.
 3. **The development login is on by default** (`dev_login = true` in `config.toml`). Switch it off before anyone else uses the machine.

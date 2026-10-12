@@ -9,6 +9,7 @@ Runs every InsightAI check and prints one summary.
   3. Cross-check of the views against ADempiere's own figures (db\crosscheck.sql)
   4. ADempiere launcher, end to end, without the GUI (needs the service running)
   5. The embedded InsightAI window, opened through ADempiere's own form frame off-screen
+  6. The real desktop client: logs in, presses the InsightAI button on the Performance tab (visible on screen for ~30 s)
 
 Nothing here changes ADempiere business data. Step 4 adds process-instance rows, as running any process does.
 #>
@@ -42,6 +43,10 @@ if (-not $SkipLauncher) {
     Write-Host "`n===== 5. Embedded window ====="
     powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'scripts\test_form.ps1') 2>&1 | ForEach-Object { "$_" } | Where-Object { $_ -match '^==|^\s+(ok|FAIL|signed|organisations)|passed|FAILED' }
     $results['Embedded window'] = $LASTEXITCODE
+
+    Write-Host "`n===== 6. Desktop client ====="
+    powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'scripts\test_client.ps1') 2>&1 | ForEach-Object { "$_" } | Where-Object { $_ -match '^(ok|FAIL|All|\d+ check)' }
+    $results['Desktop client'] = $LASTEXITCODE
 }
 
 Write-Host "`n===== Summary ====="

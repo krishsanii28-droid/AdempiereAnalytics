@@ -1,6 +1,6 @@
 # Stage 6: ADempiere integration
 
-> Since this was written the dashboard has also been embedded in an ADempiere window. The menu entry described here is now **InsightAI (browser)**, and a new **InsightAI** entry opens the window. See `docs/embedded_window.md`.
+> Since this was written the way in has changed. There is no menu entry any more: a button on the Performance tab of ADempiere's main window opens the dashboard in an ADempiere window, and the browser launcher described here is reached from that window's **Open in browser** button. The sign-in hand-off, the access rules and the install script are as described. See `docs/embedded_window.md`.
 
 Run on 2026-10-12. A backup of the `EV` database was taken first (`data\backups\EV_before_stage6_*.dump`, not in git).
 

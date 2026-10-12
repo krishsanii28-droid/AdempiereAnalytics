@@ -12,7 +12,8 @@ powershell -ExecutionPolicy Bypass -File scripts\run_tests.ps1
 | Read-only role smoke test (`db\verify_ro.sql`) | The service role can read the views and nothing else | 16 views readable, 8 forbidden statements refused |
 | Cross-check against ADempiere (`db\crosscheck.sql`) | View figures against ADempiere's own Performance measures, `RV_OpenItem`, `M_Storage`, `M_Transaction` and raw document tables | 14 of 14 match |
 | ADempiere launcher (`scripts\test_launcher.ps1`) | The real launcher process in a headless ADempiere environment, for four logins and with the service unreachable | All passed |
-| Embedded window (`scripts\test_form.ps1`) | Added after this stage: the InsightAI window opened through ADempiere's form frame for three logins, with the menu tree each role is shown | All passed |
+| Embedded window (`scripts\test_form.ps1`) | Added after this stage: the InsightAI window opened through ADempiere's form frame for three logins, with the form access ADempiere reports for each role | All passed |
+| Desktop client (`scripts\test_client.ps1`) | Added after this stage: the real client started and logged in, the button found on the Performance tab and pressed, the dashboard read | All passed |
 
 ## Python tests
 
@@ -62,7 +63,7 @@ Both were followed by a reinstall, after which the full suite passed again.
 
 | # | Criterion | Status | Evidence |
 |---|---|---|---|
-| 1 | Opens from the ADempiere Swing menu, only for authorized roles | **Verified by test, not by a person** | The embedded window is opened through ADempiere's own form frame, and the menu tree is built the way the client builds it, for a granted admin, a granted restricted role and an ungranted role (`scripts\test_form.ps1`, see `docs/embedded_window.md`). No person has clicked the entry in the real client. ZK is not supported |
+| 1 | Opens from the ADempiere Swing client, only for authorized roles | **Verified by test, not by a person** | At the owner's request the option is a button on the Performance tab rather than a menu entry. A test starts the real client, finds the button on that tab, presses it and reads the dashboard (`scripts\test_client.ps1`); another opens the window for a granted admin, a granted restricted role and an ungranted role (`scripts\test_form.ps1`). See `docs/embedded_window.md`. ZK is not supported |
 | 2 | A dashboard shows verified GardenWorld data, cross-checked against ADempiere | Met | 14 cross-checks, including two against ADempiere's own Performance goals (2,510.25 and 1,204.45) |
 | 3 | Metrics can be filtered by reporting period | Met | Period presets and custom dates; balances are labelled as of today |
 | 4 | Forecasting produces results and documents its evaluation against a baseline, real and synthetic clearly labelled | Met on synthetic data only | MASE 0.829 against 0.964 for the strongest baseline, on synthetic demand. On real data nothing can be forecast and no accuracy is claimed |
@@ -75,7 +76,7 @@ Both were followed by a reinstall, after which the full suite passed again.
 
 ## Still open
 
-1. **Click-through in the Swing client.** Start ADempiere with `RUN_Adempiere_InsightAI.bat` and click InsightAI in the main menu, directly below Performance Analysis. The automated test now covers the menu entries per role and the window loading the dashboard, so this is a confirmation by eye, including typing and clicking inside the page.
+1. **Use by a person in the Swing client.** Start ADempiere with `RUN_Adempiere_InsightAI.bat` and press **Open InsightAI dashboard** on the Performance tab. An automated test now does exactly that in the real client (`scripts\test_client.ps1`), so this is a confirmation by eye, including typing and clicking inside the page.
 2. **A look at ADempiere after install.** Open a few standard windows and the Performance tab to confirm nothing looks different. Nothing was changed that should affect them, but it has not been looked at.
 3. **Switch off the development login** (`dev_login = false` in `config.toml`) once item 1 works.
 4. **PackIn of the 2Pack** on a second ADempiere instance, if one becomes available.

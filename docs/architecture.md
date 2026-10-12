@@ -5,13 +5,12 @@
 ```
  ADempiere desktop client (Swing, Java 8)             Browser
  ┌───────────────────────────────────┐               ┌─────────────────────────┐
- │ Menu: Performance Analysis        │               │ Dashboard page          │
- │   ├─ InsightAI                    │  shows page   │  Ask InsightAI          │
- │   │    └─ InsightAIForm: window ──┼──────────────▶│  KPI cards and charts   │
- │   │       with embedded web view  │               │  Forecast panel         │
- │   └─ InsightAI (browser)          │  opens link   │                         │
- │        └─ InsightAILauncher ──────┼──────────────▶│ (same page, in the      │
- │           (both in insightai.jar) │               │  default browser)       │
+ │ Main window, Performance tab      │               │ Dashboard page          │
+ │   └─ [Open InsightAI dashboard]   │  shows page   │  Ask InsightAI          │
+ │        └─ InsightAIForm: window ──┼──────────────▶│  KPI cards and charts   │
+ │           with embedded web view  │               │  Forecast panel         │
+ │           └─ [Open in browser] ───┼──────────────▶│ (same page, in the      │
+ │   (classes in insightai.jar)      │  opens link   │  default browser)       │
  └───────────────┬───────────────────┘               └───────────┬─────────────┘
                  │ signed request for a one-time link            │ session cookie
                  ▼                                               ▼
@@ -55,6 +54,7 @@
 | A separate service and web page, shown in an ADempiere window through an embedded web view | Swing cannot draw this kind of dashboard natively, and model inference must not run in the ADempiere client or server. The window only displays the page |
 | Views in a separate schema, read through a role that sees nothing else | The service cannot read passwords, API keys or any table not listed, whatever bug it has |
 | Organisation rules in a view, not in Python | One definition, checkable against ADempiere, and used identically by every query |
+| A button added to the Performance tab by the start script's own main class, not by changing ADempiere | ADempiere offers no extension point for that tab. Wrapping the tab's panel at run time changes no ADempiere class, affects only clients started with the InsightAI start script, and leaves the tab alone if it fails |
 | Separate jar on the launcher classpath | No `RUN_setup`, no change to `Adempiere.jar` or `customization.jar`, removable by deleting one file |
 | Dictionary records by SQL script under entity type `INSAI` | Transparent, transactional, and fully reversible; the existing Ask AI records were made the same way. A 2Pack is also exported |
 | Forecast results in files, not database tables | Keeps the service's database role strictly read-only |
