@@ -28,6 +28,17 @@ class Settings:
     top_n: int
     slow_moving_days: int
     max_rows: int
+    forecast_model: str
+    horizon_weeks: int
+    min_history_weeks: int
+    min_demand_weeks: int
+    moving_average_weeks: int
+    evaluation_windows: int
+    quantiles: tuple[float, ...]
+    overdue_grace_days: int
+    excess_cover_weeks: int
+    synthetic_seed: int
+    synthetic_weeks: int
 
 
 def _read_env_file(path: Path) -> dict[str, str]:
@@ -57,6 +68,10 @@ def get_settings() -> Settings:
         )
 
     server, database, dashboard = cfg["server"], cfg["database"], cfg["dashboard"]
+    forecast, synthetic = cfg["forecast"], cfg["synthetic"]
+    quantiles = tuple(sorted(float(q) for q in forecast["quantiles"]))
+    if 0.5 not in quantiles or len(quantiles) < 3:
+        raise RuntimeError("config.toml [forecast] quantiles must include 0.5 and at least one value either side.")
     return Settings(
         host=server["host"],
         port=int(server["port"]),
@@ -74,4 +89,15 @@ def get_settings() -> Settings:
         top_n=int(dashboard["top_n"]),
         slow_moving_days=int(dashboard["slow_moving_days"]),
         max_rows=int(dashboard["max_rows"]),
+        forecast_model=forecast["model"],
+        horizon_weeks=int(forecast["horizon_weeks"]),
+        min_history_weeks=int(forecast["min_history_weeks"]),
+        min_demand_weeks=int(forecast["min_demand_weeks"]),
+        moving_average_weeks=int(forecast["moving_average_weeks"]),
+        evaluation_windows=int(forecast["evaluation_windows"]),
+        quantiles=quantiles,
+        overdue_grace_days=int(forecast["overdue_grace_days"]),
+        excess_cover_weeks=int(forecast["excess_cover_weeks"]),
+        synthetic_seed=int(synthetic["seed"]),
+        synthetic_weeks=int(synthetic["weeks"]),
     )

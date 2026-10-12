@@ -17,3 +17,18 @@ default_months = 12      # date range shown when the page opens
 top_n = 10               # rows in "top products / customers" rankings
 slow_moving_days = 90    # stock with no outbound movement for this long is listed as slow-moving
 max_rows = 200           # hard cap on rows returned by any list
+
+[forecast]
+model = "amazon/chronos-bolt-small"   # any Chronos model id; see docs/stage4_forecasting.md for the comparison
+horizon_weeks = 4                     # how far ahead to forecast
+min_history_weeks = 26                # series shorter than this are not forecast
+min_demand_weeks = 8                  # ...nor are series with fewer weeks that actually had demand
+moving_average_weeks = 8              # window of the moving-average baseline
+evaluation_windows = 6                # accuracy is measured on this many successive hold-out windows per series
+quantiles = [0.1, 0.5, 0.9]           # uncertainty range shown; must include 0.5
+overdue_grace_days = 30               # open purchase lines promised up to this many days ago still count as incoming
+excess_cover_weeks = 26               # more cover than this is flagged as excess stock
+
+[synthetic]
+seed = 20261012                       # same seed gives the same synthetic demand
+weeks = 156                           # length of each synthetic series (3 years, so a seasonal baseline can be tested)

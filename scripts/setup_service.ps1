@@ -3,11 +3,12 @@ Creates the Python environment for the analytics service and its signing key.
 
   powershell -ExecutionPolicy Bypass -File scripts\setup_service.ps1          # runtime packages
   powershell -ExecutionPolicy Bypass -File scripts\setup_service.ps1 -Dev     # plus test packages
+  powershell -ExecutionPolicy Bypass -File scripts\setup_service.ps1 -ML      # plus PyTorch and Chronos for forecasting
 
 Uses Python 3.12 through the py launcher and installs into .venv inside this project only.
 No other Python installation on the machine is touched.
 #>
-param([switch]$Dev)
+param([switch]$Dev, [switch]$ML)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $venv = Join-Path $root '.venv'
@@ -20,6 +21,11 @@ if (-not (Test-Path $python)) {
 $requirements = if ($Dev) { 'requirements-dev.txt' } else { 'requirements.txt' }
 & $python -m pip install --quiet --disable-pip-version-check -r (Join-Path $root $requirements)
 if ($LASTEXITCODE -ne 0) { throw 'pip install failed.' }
+if ($ML) {
+    # PyTorch (CPU) and Chronos: about 1 GB on disk. Without them forecasts use the statistical baseline.
+    & $python -m pip install --quiet --disable-pip-version-check -r (Join-Path $root 'requirements-ml.txt')
+    if ($LASTEXITCODE -ne 0) { throw 'pip install of the forecasting packages failed.' }
+}
 
 # Signing key for session tokens: generated once, kept in .env.
 $envFile = Join-Path $root '.env'

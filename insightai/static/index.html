@@ -42,6 +42,36 @@
     <div id="page-message" class="page-message" hidden></div>
 
     <section id="kpis" class="kpis" aria-label="Key figures"></section>
+    <section class="card forecast" aria-label="Demand forecast and stockout risk">
+      <header>
+        <div>
+          <h2>Demand forecast and stockout risk</h2>
+          <p class="basis" id="fc-status"></p>
+        </div>
+        <div class="fc-controls">
+          <div id="fc-modes" class="segmented" role="group" aria-label="Demand data used">
+            <button type="button" class="ghost" data-mode="real" aria-pressed="true">Real data</button>
+            <button type="button" class="ghost" data-mode="synthetic" aria-pressed="false">Synthetic demo data</button>
+          </div>
+          <button type="button" class="ghost" id="fc-run">Run forecast</button>
+        </div>
+      </header>
+      <div id="fc-banner" class="synthetic-banner" role="note" hidden>
+        <strong>Synthetic demand.</strong> The demand history and everything derived from it below (forecast, risk, accuracy)
+        is generated for demonstration and is not ADempiere data. Stock on hand and purchase quantities are real.
+      </div>
+      <ul class="notes" id="fc-notes"></ul>
+      <div class="body" id="fc-body">
+        <div id="fc-table"></div>
+        <div id="fc-detail" class="fc-detail"></div>
+        <div id="fc-evaluation" class="fc-evaluation"></div>
+        <details id="fc-assumptions" hidden>
+          <summary>Assumptions and limits</summary>
+          <ul id="fc-assumption-list"></ul>
+        </details>
+      </div>
+    </section>
+
     <section id="charts" class="charts" aria-label="Charts"></section>
 
     <footer class="footnote">
@@ -51,6 +81,7 @@
   </main>
 
   <script src="/vendor/plotly.min.js"></script>
+  <script src="/static/forecast.js"></script>
   <script src="/static/app.js"></script>
 </body>
 </html>

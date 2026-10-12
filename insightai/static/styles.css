@@ -17,6 +17,7 @@
   --bad: #b02a2a;
   --warn-bg: #fdf3d7;
   --warn-text: #5c4300;
+  --warn-strong: #8a5a00;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -37,6 +38,7 @@
     --bad: #e66767;
     --warn-bg: #3a2f10;
     --warn-text: #f3d68a;
+    --warn-strong: #fab219;
   }
 }
 
@@ -120,6 +122,36 @@ tbody tr:last-child td { border-bottom: 0; }
 .flag { font-weight: 600; color: var(--bad); }
 
 .footnote { margin-top: 20px; font-size: 12px; color: var(--text-muted); }
+
+/* Forecast panel */
+.forecast { margin-bottom: 16px; }
+.fc-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.segmented { display: inline-flex; }
+.segmented button { border-radius: 0; margin-left: -1px; }
+.segmented button:first-child { border-radius: 6px 0 0 6px; margin-left: 0; }
+.segmented button:last-child { border-radius: 0 6px 6px 0; }
+.segmented button[aria-pressed="true"] { font-weight: 600; }
+button:disabled { opacity: .6; cursor: default; }
+.synthetic-banner {
+  margin-top: 12px; padding: 10px 14px; border-radius: 6px;
+  background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-text);
+}
+.forecast h3 { font-size: 14px; margin: 18px 0 2px; }
+table.selectable tbody tr[data-key] { cursor: pointer; }
+table.selectable tbody tr[data-key]:hover { background: var(--grid); }
+table.selectable tbody tr.selected { background: var(--grid); box-shadow: inset 3px 0 0 var(--accent); }
+tr.muted td { color: var(--text-muted); }
+td.flags { white-space: normal; min-width: 180px; font-size: 12px; color: var(--text-secondary); }
+.level { font-weight: 600; }
+.level-high { color: var(--bad); }
+.level-medium { color: var(--warn-strong); }
+.level-low { color: var(--good); }
+.level-none { color: var(--text-muted); font-weight: 400; }
+.fc-detail { margin-top: 6px; }
+.fc-evaluation td:last-child { white-space: normal; }
+details { margin-top: 16px; font-size: 13px; color: var(--text-secondary); }
+details summary { cursor: pointer; font-weight: 600; }
+details li { margin: 4px 0; }
 
 /* Development login page */
 .dev-login { max-width: 560px; margin: 48px auto; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }

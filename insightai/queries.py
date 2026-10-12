@@ -224,8 +224,6 @@ def kpis(scope: Scope, filters: Filters) -> list[dict[str, Any]]:
             supplier["notes"].append(f"{unmatched} receipt line(s) not linked to an order line are left out")
     cards.append(supplier)
 
-    cards.append(_card("stockout_risk", "Products at stockout risk", "count", available=False,
-                       reason="Needs the demand forecast, which is added in Stage 4"))
     return cards
 
 

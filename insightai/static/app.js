@@ -359,13 +359,22 @@
     }
     showPageMessage('');
     const requestId = ++state.requestId;
+    refreshKpis();
+    for (const entry of Object.values(cards)) loadChart(entry, requestId);
+    window.InsightAIForecast.refresh();
+  }
+
+  function refreshKpis() {
+    const requestId = state.requestId;
     $('kpis').classList.add('is-loading');
     api('/api/kpis?' + filterParams())
       .then((payload) => { if (requestId === state.requestId) renderKpis(payload); })
       .catch((e) => { if (requestId === state.requestId) renderKpiError(e.message); })
       .finally(() => { if (requestId === state.requestId) $('kpis').classList.remove('is-loading'); });
-    for (const entry of Object.values(cards)) loadChart(entry, requestId);
   }
+
+  // Shared with forecast.js
+  window.InsightAI = { api, el, css, number, filterParams, refreshKpis };
 
   async function start() {
     buildCards();
@@ -404,6 +413,7 @@
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
       for (const entry of Object.values(cards)) if (entry.data) draw(entry);
     });
+    window.InsightAIForecast.init();
     refresh();
   }
 

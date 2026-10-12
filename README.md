@@ -9,7 +9,7 @@ Analytics and decision-support module for a local ADempiere 3.9.3 installation (
 | 1. Installation assessment | Done: `docs/stage1_assessment.md` |
 | 2. Data discovery, `insightai` schema, read-only role, KPI definitions | Done: `docs/stage2_data_discovery.md`, `docs/kpi_definitions.md` |
 | 3. FastAPI service and dashboard | Done: KPI cards, sales, purchase, inventory and receivables views, filters |
-| 4. Forecasting | Not started |
+| 4. Forecasting | Done: `docs/stage4_forecasting.md`. Chronos forecast, baseline comparison, stockout risk, synthetic demo mode |
 | 5. Assistant | Not started |
 | 6. ADempiere menu integration | Not started |
 | 7. Testing and documentation | Not started |
@@ -57,6 +57,17 @@ Settings are in `config.toml` (port, default period, ranking size, slow-moving t
 | `fastapi`, `uvicorn` | The HTTP API and the server that runs it |
 | `psycopg` | PostgreSQL driver and connection pool |
 | `plotly` | Only for the `plotly.min.js` it bundles, so charts work without internet access |
+
+### Forecasting
+
+```
+powershell -ExecutionPolicy Bypass -File scripts\setup_service.ps1 -ML
+.venv\Scripts\python.exe -m insightai.forecast
+```
+
+The first command adds PyTorch (CPU) and `chronos-forecasting`, about 1 GB. The second downloads the model to `models/` on first use (183 MB), then writes the real and synthetic result files to `data/`. Both folders are ignored by git. The dashboard's **Run forecast** button does the same.
+
+GardenWorld's real shipment history is too thin to forecast, so the real view shows why each product is not forecast and claims no accuracy. The **Synthetic demo data** view is generated demand, labelled as such everywhere it appears. Without the forecasting packages or the model, a statistical baseline is used and the page says so.
 
 ### Tests
 

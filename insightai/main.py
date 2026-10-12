@@ -14,6 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from . import auth, db, queries
 from .auth import Session
 from .config import get_settings
+from .forecast import store as forecast_store
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 log = logging.getLogger("insightai")
@@ -121,8 +122,9 @@ def me(session: Session = Depends(auth.require_session)) -> dict:
 @app.get("/api/kpis")
 def kpis(scoped: tuple[queries.Scope, queries.Filters] = Depends(_scope_and_filters)) -> dict:
     scope, filters = scoped
-    return {"period": {"from": filters.date_from.isoformat(), "to": filters.date_to.isoformat()},
-            "cards": queries.kpis(scope, filters)}
+    cards = queries.kpis(scope, filters)
+    cards.append(forecast_store.stockout_card(scope, filters))
+    return {"period": {"from": filters.date_from.isoformat(), "to": filters.date_to.isoformat()}, "cards": cards}
 
 
 @app.get("/api/charts/{name}")
@@ -131,6 +133,33 @@ def chart(name: str, scoped: tuple[queries.Scope, queries.Filters] = Depends(_sc
         raise HTTPException(status_code=404, detail="Unknown chart.")
     scope, filters = scoped
     return queries.chart(name, scope, filters)
+
+
+@app.get("/api/forecast")
+def forecast(mode: str = Query("real", pattern="^(real|synthetic)$"),
+             scoped: tuple[queries.Scope, queries.Filters] = Depends(_scope_and_filters)) -> dict:
+    scope, filters = scoped
+    return forecast_store.summary(mode, scope, filters)
+
+
+@app.get("/api/forecast/series")
+def forecast_series(product_id: int, warehouse_id: int, mode: str = Query("real", pattern="^(real|synthetic)$"),
+                    session: Session = Depends(auth.require_session)) -> dict:
+    # Looked up within the session's organisations only, so another organisation's series is "not found".
+    found = forecast_store.series(mode, queries.Scope(session.client_id, session.org_ids), product_id, warehouse_id)
+    if found is None:
+        raise HTTPException(status_code=404, detail="No forecast series for that product and warehouse.")
+    return found
+
+
+@app.post("/api/forecast/run")
+def forecast_run(_: Session = Depends(auth.require_session)) -> dict:
+    return forecast_store.start_run()
+
+
+@app.get("/api/forecast/status")
+def forecast_status(_: Session = Depends(auth.require_session)) -> dict:
+    return forecast_store.run_status()
 
 
 # --------------------------------------------------------------------------------------
