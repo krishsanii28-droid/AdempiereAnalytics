@@ -60,5 +60,12 @@ foreach ($case in $cases) {
     try { Invoke-WebRequest -Uri $url -UseBasicParsing -MaximumRedirection 0 | Out-Null; Write-Host '   FAIL: the launch link worked a second time'; $failed++ }
     catch { if ($_.Exception.Response.StatusCode.value__ -eq 401) { Write-Host '   ok: the launch link cannot be reused (401)' } else { Write-Host "   FAIL: unexpected $($_.Exception.Message)"; $failed++ } }
 }
+Write-Host "`n== InsightAI service not running (launcher pointed at a closed port)"
+$ErrorActionPreference = 'Continue'
+$down = (& "$javaHome\bin\java.exe" -cp "$out;$cp" LauncherHarness unreachable 'http://127.0.0.1:9' 2>&1 | ForEach-Object { "$_" }) -join "`n"
+$ErrorActionPreference = 'Stop'
+if ($down -match 'HARNESS error=true summary=AdempiereUserError: (The InsightAI service is not running[^\r\n]*)') { Write-Host "   ok: ADempiere shows: $($Matches[1])" }
+else { Write-Host "   FAIL: $down"; $failed++ }
+
 Write-Host "`n$(if ($failed) { "$failed check(s) FAILED" } else { 'All launcher checks passed' })"
 exit $failed

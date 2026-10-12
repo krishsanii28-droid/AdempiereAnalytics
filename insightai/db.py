@@ -76,6 +76,11 @@ def query(sql: str, params: dict[str, Any] | None = None) -> list[dict[str, Any]
         log.error("query cancelled by statement_timeout")
         raise DatabaseUnavailable("The query took too long and was cancelled.") from exc
     except psycopg.OperationalError as exc:
+        # Only connection, shutdown and resource failures mean "unavailable" (SQLSTATE classes 08, 57, 53,
+        # or no SQLSTATE at all when the server could not be reached). Anything else is a real query error.
+        state = getattr(exc, "sqlstate", None)
+        if state and not state.startswith(("08", "57", "53")):
+            raise
         # str(exc) can include the connection string; log the class only.
         log.error("database unavailable: %s", type(exc).__name__)
         raise DatabaseUnavailable("The ADempiere database is not reachable.") from exc

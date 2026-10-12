@@ -17,6 +17,16 @@ import org.insightai.adempiere.InsightAILauncher;
  */
 public class LauncherHarness {
 	public static void main(String[] args) throws Exception {
+		if (args.length == 2 && "unreachable".equals(args[0])) {
+			// What the user sees in ADempiere when the InsightAI service is not running
+			try {
+				InsightAILauncher.requestLaunchUrl(args[1], "any-key", 101, 102);
+				System.out.println("HARNESS error=false summary=unexpectedly got a link");
+			} catch (Exception e) {
+				System.out.println("HARNESS error=true summary=" + e.getClass().getSimpleName() + ": " + e.getMessage());
+			}
+			return;
+		}
 		int userId = Integer.parseInt(args[0]), roleId = Integer.parseInt(args[1]);
 		int clientId = Integer.parseInt(args[2]), orgId = Integer.parseInt(args[3]);
 

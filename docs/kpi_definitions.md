@@ -45,4 +45,4 @@ Run on 2026-10-12 against GardenWorld, all organisations.
 - **Supplier performance has no signal.** 21 of 26 receipt lines link to an order line and every one arrived on the promised date. The KPI is computable but will read 100% until real late receipts exist.
 - **Two versions of "incoming stock" disagree.** Open purchase order lines total 617 units; `M_Storage.QtyOrdered` totals 337. 381 of the open units are on 2019 purchase orders that were never received against. Stage 4 should use open order lines with a promised date inside the horizon and show `QtyOrdered` next to it.
 - **No returns or credit memos exist yet**, so the sign handling is untested on real rows.
-- **Demand history is far too thin to forecast:** 9 products, 11 product-days, at most 2 shipment days per product. Synthetic mode is required for Stage 4.
+- **Demand history is far too thin to forecast:** 6 stocked products, 7 product-days, at most 2 shipment days per product. Synthetic mode is required for Stage 4.

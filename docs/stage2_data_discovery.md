@@ -79,4 +79,6 @@ ADempiere's PL/pgSQL functions (`currencyConvert`, `invoiceOpen`, `paymentTermDu
 - `scripts\db_verify.ps1` as `insightai_ro`: all 16 views return rows; reading `adempiere.c_invoice`, `ad_user.password` and `ad_sysconfig`, calling `adempiere.invoiceopen`, and creating a table in `public`, `insightai` or as a temp table are all refused.
 - Cross-checks against ADempiere's Performance goals, `M_Storage` and `RV_OpenItem`: all match (see `kpi_definitions.md`).
 
+Corrected in Stage 7: `v_demand_daily` originally included service and expense items that appear on shipment documents but move no stock. It now holds stocked items only, and `scripts\db_crosscheck.ps1` compares it with `M_Transaction`.
+
 Not yet tested: returns and credit-memo sign handling (no such documents exist), and `IsUseUserOrgAccess` roles (none exist).

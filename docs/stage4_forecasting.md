@@ -35,10 +35,12 @@ MASE scales each error by the in-sample error of repeating last week's value, so
 
 ## Real data: nothing can be forecast yet
 
-A series is forecast only if it spans at least 26 weeks and has demand in at least 8 of them. Of the 37 product and warehouse combinations with stock or shipments:
+A series is forecast only if it spans at least 26 weeks and has demand in at least 8 of them. Of the 33 product and warehouse combinations with stock or shipments:
 
 - 27 have no completed customer shipments at all.
-- 10 have shipments in only 1 or 2 weeks (9 in a single week).
+- 6 have shipments in only 1 or 2 weeks (5 in a single week).
+
+(Before Stage 7 these counts read 37 and 10: service and expense items on shipment documents were being counted as stock demand. The demand view now holds stocked items only.)
 
 So in real mode every row reads "Not forecast" with its reason, no accuracy is reported, and the dashboard's "Products at stockout risk" card shows "Data unavailable". The first version of the rule only checked the span of the series; it let through four 2018-2019 products whose history was one shipment followed by seven years of zeros, and "evaluated" them at near-zero error. The demand-weeks rule was added to stop that.
 
@@ -54,7 +56,7 @@ Current synthetic result for GardenWorld: 26 series, 7 high risk, 6 medium, 13 l
 
 ## How a forecast is built
 
-1. Daily demand from `insightai.v_demand_daily`: completed customer shipments (`C-`) minus customer returns (`C+`), by `MovementDate`. Voided and reversed documents are already excluded by the view.
+1. Daily demand from `insightai.v_demand_daily`: completed customer shipments (`C-`) minus customer returns (`C+`) of stocked items, by `MovementDate`. Voided and reversed documents are already excluded by the view.
 2. Summed into weeks (Monday to Sunday), from the first week with demand to the last *complete* week. Missing weeks are zero. A week where returns exceed shipments is set to zero and counted.
 3. Outlier weeks are flagged (median absolute deviation rule, threshold 3.5) and shown on the chart. They are not removed.
 4. The model forecasts 4 weeks at the 10th, 50th and 90th percentiles.

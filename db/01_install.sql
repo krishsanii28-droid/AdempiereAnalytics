@@ -310,7 +310,10 @@ SELECT io.ad_client_id, io.ad_org_id, io.m_inout_id, io.documentno, iol.m_inoutl
        iol.movementqty AS movement_qty,
        iol.c_orderline_id, ol.datepromised::date AS date_promised,
        CASE WHEN io.movementtype = 'V+' AND ol.datepromised IS NOT NULL
-            THEN io.movementdate::date - ol.datepromised::date END AS days_late
+            THEN io.movementdate::date - ol.datepromised::date END AS days_late,
+       -- Only stocked items move stock. Services, expense types and resources can appear on a
+       -- shipment document but create no M_Transaction, so they are not stock demand.
+       (p.isstocked = 'Y' AND p.producttype = 'I') AS is_stocked_item
 FROM adempiere.m_inout io
 JOIN adempiere.m_inoutline iol ON iol.m_inout_id = io.m_inout_id AND iol.isactive = 'Y'
 LEFT JOIN adempiere.c_orderline ol ON ol.c_orderline_id = iol.c_orderline_id
@@ -319,7 +322,8 @@ WHERE io.isactive = 'Y'
   AND io.docstatus IN ('CO', 'CL')
   AND io.movementtype IN ('C-', 'C+', 'V+', 'V-');
 
--- Daily demand per product and warehouse from customer shipments, with returns kept separate.
+-- Daily demand per stocked product and warehouse from customer shipments, with returns kept separate.
+-- Services and other non-stocked items are left out: they cannot run out of stock.
 -- Days without a shipment have no row; the forecasting code fills them with zero.
 CREATE OR REPLACE VIEW insightai.v_demand_daily AS
 SELECT l.ad_client_id, l.ad_org_id, l.m_warehouse_id, l.m_product_id, l.m_product_category_id,
@@ -328,7 +332,7 @@ SELECT l.ad_client_id, l.ad_org_id, l.m_warehouse_id, l.m_product_id, l.m_produc
        SUM(CASE WHEN l.movementtype = 'C+' THEN l.movement_qty ELSE 0 END) AS qty_returned,
        SUM(CASE WHEN l.movementtype = 'C-' THEN l.movement_qty ELSE -l.movement_qty END) AS qty_net
 FROM insightai.v_inout_line l
-WHERE l.movementtype IN ('C-', 'C+') AND l.m_product_id IS NOT NULL
+WHERE l.movementtype IN ('C-', 'C+') AND l.m_product_id IS NOT NULL AND l.is_stocked_item
 GROUP BY l.ad_client_id, l.ad_org_id, l.m_warehouse_id, l.m_product_id, l.m_product_category_id, l.movement_date;
 
 -- Open receivables and payables, from ADempiere's RV_OpenItem. days_due > 0 means overdue.

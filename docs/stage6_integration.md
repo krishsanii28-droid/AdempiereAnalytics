@@ -79,7 +79,7 @@ The headless test (`scripts\test_launcher.ps1`) starts ADempiere's environment, 
 - That the **InsightAI** entry appears under Performance Analysis in the Swing menu for GardenWorld Admin and SalesRep(Restricted), and not for GardenWorld User.
 - That clicking it opens the default browser. In the headless test the browser step was switched off and the link was followed by the test instead.
 
-Also not tested: the launcher's message when the service is not running, and the ZK web client.
+Also not tested: the ZK web client. (The launcher's message when the service is not running was added to `scripts\test_launcher.ps1` in Stage 7 and passes.)
 
 ## Things to know
 
