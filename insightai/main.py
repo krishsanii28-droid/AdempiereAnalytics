@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Redirect
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import auth, db, queries
+from . import auth, db, launch, queries
 from .auth import Session
 from .config import get_settings
 from .assistant import engine as assistant_engine
@@ -198,6 +198,38 @@ def index(request: Request):
             return RedirectResponse("/dev/login", status_code=303)
         return HTMLResponse("<h1>InsightAI</h1><p>Open InsightAI from the ADempiere menu.</p>", status_code=401)
     return FileResponse(STATIC / "index.html", headers={"Cache-Control": "no-store"})
+
+
+class LaunchRequest(BaseModel):
+    user_id: int
+    role_id: int
+    timestamp: int
+    nonce: str = Field(min_length=8, max_length=64)
+    signature: str = Field(min_length=64, max_length=64)
+
+
+@app.post("/auth/launch-token", include_in_schema=False)
+def launch_token(body: LaunchRequest) -> JSONResponse:
+    """Called by the ADempiere launcher process, not by a browser."""
+    try:
+        code = launch.issue_code(body.user_id, body.role_id, body.timestamp, body.nonce, body.signature)
+    except launch.LaunchRefused as refused:
+        log.warning("launch refused for user %s role %s: %s", body.user_id, body.role_id, refused.message)
+        return JSONResponse(status_code=refused.status, content={"detail": refused.message})
+    return JSONResponse({"url": f"{get_settings().public_url}/launch?code={code}", "expires_in": launch.CODE_TTL_SECONDS})
+
+
+@app.get("/launch", include_in_schema=False)
+def launch_page(code: str = ""):
+    ids = launch.redeem_code(code)
+    if ids is None:
+        return HTMLResponse("<!doctype html><meta charset='utf-8'><title>InsightAI</title>"
+                            "<link rel='stylesheet' href='/static/styles.css'><main class='dev-login'>"
+                            "<h1>This link has expired</h1><p>InsightAI links from ADempiere work once and for one minute. "
+                            "Open InsightAI again from the ADempiere menu.</p></main>", status_code=401)
+    response = RedirectResponse("/", status_code=303)
+    _set_session_cookie(response, *ids)
+    return response
 
 
 @app.get("/logout", include_in_schema=False)

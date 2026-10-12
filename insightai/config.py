@@ -17,6 +17,8 @@ class Settings:
     session_hours: int
     dev_login: bool
     secret_key: str
+    launch_key: str
+    public_url: str
     db_host: str
     db_port: int
     db_name: str
@@ -83,6 +85,8 @@ def get_settings() -> Settings:
         session_hours=int(server["session_hours"]),
         dev_login=bool(server["dev_login"]),
         secret_key=env["INSIGHTAI_SECRET_KEY"],
+        launch_key=env.get("INSIGHTAI_LAUNCH_KEY", ""),
+        public_url=(server.get("public_url") or f"http://{server['host']}:{server['port']}").rstrip("/"),
         db_host=env.get("INSIGHTAI_DB_HOST", "localhost"),
         db_port=int(env.get("INSIGHTAI_DB_PORT", "5432")),
         db_name=env.get("INSIGHTAI_DB_NAME", "adempiere"),

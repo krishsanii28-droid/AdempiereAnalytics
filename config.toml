@@ -4,6 +4,8 @@
 host = "127.0.0.1"      # keep on loopback: the service is meant for the machine ADempiere runs on
 port = 8765
 session_hours = 8
+# Address the browser should open. Leave empty to use http://<host>:<port>.
+public_url = ""
 # Lets you pick a user and role at /dev/login without going through ADempiere.
 # For development only. Set to false once the ADempiere menu entry (Stage 6) is in place.
 dev_login = true

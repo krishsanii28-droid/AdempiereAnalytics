@@ -11,7 +11,7 @@ Analytics and decision-support module for a local ADempiere 3.9.3 installation (
 | 3. FastAPI service and dashboard | Done: KPI cards, sales, purchase, inventory and receivables views, filters |
 | 4. Forecasting | Done: `docs/stage4_forecasting.md`. Chronos forecast, baseline comparison, stockout risk, synthetic demo mode |
 | 5. Assistant | Done: `docs/stage5_assistant.md`. 16 approved question types, MiniLM matching with keyword fallback |
-| 6. ADempiere menu integration | Not started |
+| 6. ADempiere menu integration | Done: `docs/stage6_integration.md`. Menu entry, launcher jar, signed hand-off, 2Pack. Needs a click-through in the desktop client |
 | 7. Testing and documentation | Not started |
 
 ## Database setup (Windows)
@@ -74,6 +74,14 @@ GardenWorld's real shipment history is too thin to forecast, so the real view sh
 The **Ask InsightAI** box answers a fixed set of business questions in plain English. A local embedding model (`all-MiniLM-L6-v2`, installed by `setup_service.ps1 -ML`) picks which approved query fits the question; no SQL is generated and nothing is sent to an outside service. Questions it cannot place are declined with a list of what it can answer.
 
 To see how the matcher performs: `.venv\Scripts\python.exe scripts\calibrate_assistant.py --test`
+
+### Opening it from ADempiere
+
+```
+powershell -ExecutionPolicy Bypass -File scripts\adempiere_install.ps1
+```
+
+This compiles the launcher, adds three new files to the ADempiere folder, and adds an **InsightAI** entry under Performance Analysis for the roles named with `-Roles` (default: GardenWorld Admin and SalesRep(Restricted)). Then restart the InsightAI service and start ADempiere with `RUN_Adempiere_InsightAI.bat`. `-Uninstall` removes all of it. `scripts\test_launcher.ps1` tests the hand-off without the GUI, and `scripts\packout.ps1` re-exports the 2Pack in `adempiere\2pack`.
 
 ### Tests
 

@@ -43,6 +43,8 @@ BEGIN
     -- organisation and access model
     'ad_client','ad_clientinfo','ad_org','ad_role','ad_user_roles','ad_role_orgaccess','ad_user_orgaccess',
     'ad_tree','ad_treenode',
+    -- which roles may open InsightAI from the ADempiere menu
+    'ad_process','ad_process_access',
     -- currency
     'c_acctschema','c_currency','c_conversion_rate','c_conversiontype','c_conversiontype_default',
     -- documents
@@ -183,6 +185,14 @@ JOIN adempiere.ad_role r ON r.ad_role_id = ur.ad_role_id AND r.isactive = 'Y'
 JOIN adempiere.ad_client c ON c.ad_client_id = r.ad_client_id
 LEFT JOIN adempiere.c_currency cur ON cur.c_currency_id = insightai.base_currency_id(r.ad_client_id)
 WHERE ur.isactive = 'Y';
+
+-- Which processes a role may run (AD_Process_Access). The service uses it to check that the role
+-- asking to open InsightAI has been granted the InsightAI menu entry in ADempiere.
+CREATE OR REPLACE VIEW insightai.v_role_process AS
+SELECT pa.ad_role_id, p.value AS process_value
+FROM adempiere.ad_process_access pa
+JOIN adempiere.ad_process p ON p.ad_process_id = pa.ad_process_id AND p.isactive = 'Y'
+WHERE pa.isactive = 'Y';
 
 -- ---------------------------------------------------------------------------------------
 -- Dimensions (for filters and labels)
