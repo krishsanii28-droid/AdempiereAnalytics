@@ -75,7 +75,7 @@ Both were followed by a reinstall, after which the full suite passed again.
 
 ## Still open
 
-1. **Click-through in the Swing client.** Start ADempiere with `RUN_Adempiere_InsightAI.bat` and open Performance Analysis > InsightAI. The automated test now covers the menu entries per role and the window loading the dashboard, so this is a confirmation by eye, including typing and clicking inside the page.
+1. **Click-through in the Swing client.** Start ADempiere with `RUN_Adempiere_InsightAI.bat` and click InsightAI in the main menu, directly below Performance Analysis. The automated test now covers the menu entries per role and the window loading the dashboard, so this is a confirmation by eye, including typing and clicking inside the page.
 2. **A look at ADempiere after install.** Open a few standard windows and the Performance tab to confirm nothing looks different. Nothing was changed that should affect them, but it has not been looked at.
 3. **Switch off the development login** (`dev_login = false` in `config.toml`) once item 1 works.
 4. **PackIn of the 2Pack** on a second ADempiere instance, if one becomes available.

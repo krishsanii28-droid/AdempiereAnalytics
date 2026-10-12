@@ -26,7 +26,7 @@ powershell -ExecutionPolicy Bypass -File scripts\adempiere_install.ps1
 powershell -ExecutionPolicy Bypass -File scripts\run_service.ps1
 ```
 
-Then start ADempiere with `RUN_Adempiere_InsightAI.bat` and open **Performance Analysis > InsightAI**. The dashboard opens in an ADempiere window; **InsightAI (browser)** opens it in your web browser instead.
+Then start ADempiere with `RUN_Adempiere_InsightAI.bat` and click **InsightAI** in the main menu, directly below Performance Analysis. The dashboard opens in an ADempiere window; **InsightAI (browser)**, inside the Performance Analysis folder, opens it in your web browser instead.
 
 To check an installation: `powershell -ExecutionPolicy Bypass -File scripts\run_tests.ps1`
 

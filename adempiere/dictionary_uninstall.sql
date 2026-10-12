@@ -18,8 +18,12 @@ DELETE FROM ad_package_exp_detail WHERE ad_menu_id IN (SELECT ad_menu_id FROM in
                                      OR ad_process_id IN (SELECT ad_process_id FROM insightai_processes)
                                      OR ad_form_id IN (SELECT ad_form_id FROM insightai_forms);
 
--- menu entries
-DELETE FROM ad_recentitem         WHERE ad_menu_id IN (SELECT ad_menu_id FROM insightai_menus);
+-- menu entries. The install moved the top-level entries after InsightAI down one place; move them back.
+UPDATE ad_treenodemm x SET seqno = x.seqno - 1, updated = now()
+FROM ad_treenodemm n
+WHERE n.node_id IN (SELECT ad_menu_id FROM insightai_menus) AND n.parent_id = 0
+  AND x.ad_tree_id = n.ad_tree_id AND x.parent_id = 0 AND x.seqno > n.seqno;
+DELETE FROM ad_recentitem        WHERE ad_menu_id IN (SELECT ad_menu_id FROM insightai_menus);
 DELETE FROM ad_tree_favorite_node WHERE ad_menu_id IN (SELECT ad_menu_id FROM insightai_menus);
 DELETE FROM ad_treebar            WHERE node_id IN (SELECT ad_menu_id FROM insightai_menus);
 DELETE FROM ad_treenodemm         WHERE node_id IN (SELECT ad_menu_id FROM insightai_menus);

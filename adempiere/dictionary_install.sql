@@ -127,6 +127,28 @@ FROM ad_process p CROSS JOIN ad_role r
 WHERE p.value = 'InsightAI_Launch' AND r.isactive = 'Y' AND r.name IN (:roles)
   AND NOT EXISTS (SELECT 1 FROM ad_process_access a WHERE a.ad_process_id = p.ad_process_id AND a.ad_role_id = r.ad_role_id);
 
+-- Move the embedded-window entry to the top level of the menu, directly after Performance Analysis,
+-- so it is visible as soon as ADempiere opens. Menu positions are whole numbers, so the top-level
+-- entries that follow are each moved down one place (their order is unchanged); the uninstall
+-- closes the gap again. Done only while the entry still sits inside the Performance Analysis
+-- folder, so a position chosen later by hand in ADempiere is left alone.
+WITH target AS (
+  SELECT n.ad_tree_id, n.node_id, pa.seqno + 1 AS wanted
+  FROM ad_treenodemm n
+  JOIN ad_menu m ON m.ad_menu_id = n.node_id AND m.entitytype = 'INSAI' AND m.action = 'X'
+  JOIN ad_menu pam ON pam.name = 'Performance Analysis' AND pam.issummary = 'Y' AND pam.entitytype = 'D'
+  JOIN ad_treenodemm pa ON pa.ad_tree_id = n.ad_tree_id AND pa.node_id = pam.ad_menu_id AND pa.parent_id = 0
+  WHERE n.parent_id = pam.ad_menu_id
+), make_room AS (
+  UPDATE ad_treenodemm x SET seqno = x.seqno + 1, updated = now()
+  FROM target t
+  WHERE x.ad_tree_id = t.ad_tree_id AND x.parent_id = 0 AND x.seqno >= t.wanted AND x.node_id <> t.node_id
+  RETURNING 1
+)
+UPDATE ad_treenodemm n SET parent_id = 0, seqno = t.wanted, updated = now()
+FROM target t
+WHERE n.ad_tree_id = t.ad_tree_id AND n.node_id = t.node_id;
+
 -- The same roles, and only those, may open the embedded window
 DELETE FROM ad_form_access
 WHERE ad_form_id = (SELECT ad_form_id FROM ad_form WHERE classname = 'org.insightai.adempiere.InsightAIForm')
@@ -143,9 +165,9 @@ WHERE f.classname = 'org.insightai.adempiere.InsightAIForm' AND r.isactive = 'Y'
 SELECT 'entity type' AS record, entitytype AS key, ad_entitytype_id AS id FROM ad_entitytype WHERE entitytype = 'INSAI'
 UNION ALL SELECT 'form', name, ad_form_id FROM ad_form WHERE classname = 'org.insightai.adempiere.InsightAIForm'
 UNION ALL SELECT 'process', value, ad_process_id FROM ad_process WHERE value = 'InsightAI_Launch'
-UNION ALL (SELECT 'menu under ' || pm.name || ', position ' || n.seqno, m.name, m.ad_menu_id FROM ad_menu m
-           JOIN ad_treenodemm n ON n.node_id = m.ad_menu_id JOIN ad_menu pm ON pm.ad_menu_id = n.parent_id
-           WHERE m.entitytype = 'INSAI' ORDER BY n.seqno)
+UNION ALL (SELECT 'menu: ' || COALESCE('inside ' || pm.name, 'top level') || ', position ' || n.seqno, m.name, m.ad_menu_id FROM ad_menu m
+           JOIN ad_treenodemm n ON n.node_id = m.ad_menu_id LEFT JOIN ad_menu pm ON pm.ad_menu_id = n.parent_id
+           WHERE m.entitytype = 'INSAI' ORDER BY n.parent_id, n.seqno)
 UNION ALL SELECT 'form access', r.name, r.ad_role_id FROM ad_form_access a JOIN ad_role r ON r.ad_role_id = a.ad_role_id
           JOIN ad_form f ON f.ad_form_id = a.ad_form_id WHERE f.classname = 'org.insightai.adempiere.InsightAIForm' AND a.isactive = 'Y'
 UNION ALL SELECT 'process access', r.name, r.ad_role_id FROM ad_process_access a JOIN ad_role r ON r.ad_role_id = a.ad_role_id

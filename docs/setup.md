@@ -44,7 +44,7 @@ The list is complete: a role you leave out loses access.
 
 1. Start the service: `scripts\run_service.ps1`. The first question to the assistant is fast only after the model has loaded, a few seconds after start-up.
 2. Start ADempiere with `RUN_Adempiere_InsightAI.bat` and log in.
-3. Open **Performance Analysis > InsightAI**. The dashboard opens in an ADempiere window, signed in as your ADempiere user and role. **InsightAI (browser)** below it opens the same dashboard in your web browser instead.
+3. Click **InsightAI** in the main menu. It sits at the top level, directly below the Performance Analysis folder, so it is visible without opening any folder. The dashboard opens in an ADempiere window, signed in as your ADempiere user and role. **InsightAI (browser)**, the last item inside the Performance Analysis folder, opens the same dashboard in your web browser instead.
 4. Use **Run forecast** on the page, or step 3 above, after stock or shipments change. The forecast is a snapshot of the moment it was run.
 
 Settings are in `config.toml`: port, default period, forecast horizon and thresholds, model names, assistant threshold. Restart the service after changing it.

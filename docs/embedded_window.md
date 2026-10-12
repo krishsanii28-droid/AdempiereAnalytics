@@ -4,12 +4,14 @@ Added on 2026-10-12, after Stage 7. The dashboard now opens as a window of the A
 
 ## What you see
 
-Under **Performance Analysis** there are two entries:
+There are two menu entries:
 
-| Menu entry | What it does |
-|---|---|
-| **InsightAI** | Opens an ADempiere window containing the dashboard, signed in as your ADempiere user and role |
-| **InsightAI (browser)** | Opens the same dashboard in your default web browser, as before |
+| Menu entry | Where | What it does |
+|---|---|---|
+| **InsightAI** | Top level of the menu, directly below the Performance Analysis folder | Opens an ADempiere window containing the dashboard, signed in as your ADempiere user and role |
+| **InsightAI (browser)** | Last item inside the Performance Analysis folder | Opens the same dashboard in your default web browser, as before |
+
+The main entry was first placed inside the Performance Analysis folder, where it was the seventeenth item and easy to miss. It is at the top level so that it is visible as soon as ADempiere opens. Menu positions are whole numbers, so the install moves the top-level entries after it (Assets onwards) down one place each without changing their order, and the uninstall moves them back; both directions were tested. If you later drag the entry somewhere else in ADempiere, re-running the install leaves it there.
 
 The window has ADempiere's usual File / View / Tools menu and two buttons: **Reload**, which signs in again and reloads the page (use it after the 8-hour session ends), and **Open in browser**.
 
